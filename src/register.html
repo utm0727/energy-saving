@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Smart Home Energy Management System</title>
+    <style>
+        /* 复用 login.css 的样式 */
+        /* 添加注册特定样式 */
+        .verification-methods {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+    <link rel="stylesheet" href="styles/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>User Registration</h2>
+            <form id="register-form" class="registration-form">
+                <div class="input-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="ic-number">IC Number</label>
+                    <input type="text" id="ic-number" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="tnb-account">TNB Account Number</label>
+                    <input type="text" id="tnb-account" required>
+                </div>
+
+                <div class="verification-methods">
+                    <h3>Verification Method</h3>
+                    <label>
+                        <input type="radio" name="verify-method" value="ic">
+                        IC Verification
+                    </label>
+                    <label>
+                        <input type="radio" name="verify-method" value="phone">
+                        Phone Verification
+                    </label>
+                </div>
+
+                <button type="submit" class="login-btn">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/register.js"></script>
+</body>
+</html> 

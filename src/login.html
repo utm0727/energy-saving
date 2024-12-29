@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Smart Home Energy Management System</title>
+    <style>
+        /* 直接在HTML中定义样式，确保样式一定会加载 */
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #4CAF50;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2196F3, #4CAF50);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .language-selector select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-container img {
+            max-width: 200px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #1976D2;
+        }
+
+        .login-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .login-links a {
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="language-selector">
+                <select id="language" onchange="changeLanguage()">
+                    <option value="en">English</option>
+                    <option value="zh">中文</option>
+                    <option value="ms">Bahasa Melayu</option>
+                </select>
+            </div>
+            <div class="logo-container">
+                <img src="pic/logo.png" alt="Smart Energy Logo">
+            </div>
+            <h2 id="login-title">User Login</h2>
+            <form id="login-form" onsubmit="return handleLogin(event)">
+                <div class="input-group">
+                    <label for="username" id="username-label">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password" id="password-label">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="login-btn" id="login-button">Login</button>
+                <div class="login-links">
+                    <a href="#forgot-password" id="forgot-password">Forgot Password?</a>
+                    <a href="register.html" id="register-link">Register</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            zh: {
+                loginTitle: "用户登录",
+                username: "用户名",
+                password: "密码",
+                loginButton: "登录",
+                forgotPassword: "忘记密码？",
+                register: "新用户注册"
+            },
+            en: {
+                loginTitle: "User Login",
+                username: "Username",
+                password: "Password",
+                loginButton: "Login",
+                forgotPassword: "Forgot Password?",
+                register: "Register"
+            },
+            ms: {
+                loginTitle: "Log Masuk Pengguna",
+                username: "Nama Pengguna",
+                password: "Kata Laluan",
+                loginButton: "Log Masuk",
+                forgotPassword: "Lupa Kata Laluan?",
+                register: "Daftar"
+            }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('language').value;
+            const t = translations[lang];
+            
+            document.getElementById('login-title').textContent = t.loginTitle;
+            document.querySelector('label[for="username"]').textContent = t.username;
+            document.querySelector('label[for="password"]').textContent = t.password;
+            document.querySelector('.login-btn').textContent = t.loginButton;
+            document.getElementById('forgot-password').textContent = t.forgotPassword;
+            document.getElementById('register-link').textContent = t.register;
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === "admin" && password === "password") {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                window.location.href = 'index.html';
+            } else {
+                alert('用户名或密码错误！');
+            }
+        }
+
+        // 检查是否已登录
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html> 

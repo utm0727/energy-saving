@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Energy Management System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- 添加图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 确保按正确顺序加载脚本 -->
+    <script src="data/energy_data.js"></script>
+    <script src="components/Dashboard.js"></script>
+    <script src="js/main.js"></script>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="logo">
+            <img src="pic/logo.png" alt="Smart Energy Logo">
+        </div>
+        <div class="language-selector">
+            <select id="language" onchange="changeLanguage()" title="Select Language" aria-label="Select Language">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+                <option value="ms">Bahasa Melayu</option>
+            </select>
+        </div>
+        <div class="nav-links">
+            <a href="#dashboard" class="active" data-page="dashboard" data-translate="dashboard">Dashboard</a>
+            <a href="#analysis" data-page="analysis" data-translate="analysis">Analysis</a>
+            <a href="#recommendations" data-page="recommendations" data-translate="recommendations">AI Recommendations</a>
+            <a href="#leaderboard" data-page="leaderboard" data-translate="leaderboard">Community Leaderboard</a>
+            <a href="#settings" data-page="settings" data-translate="settings">Settings</a>
+        </div>
+        <div class="user-profile">
+            <div class="user-menu" id="userMenu">
+                <!-- 登录状态 -->
+                <div class="logged-in">
+                    <div class="user-info" onclick="toggleUserDropdown()">
+                        <span class="user-name" id="username" data-translate="username">Username</span>
+                        <img src="pic/profile.png" alt="User Avatar" class="user-avatar">
+                    </div>
+                    <div class="user-dropdown">
+                        <a href="#profile" data-translate="profile">Profile</a>
+                        <button class="logout-btn" data-translate="logout">Logout</button>
+                    </div>
+                </div>
+                <!-- 未登录状态 -->
+                <div class="logged-out">
+                    <button class="login-btn" onclick="window.location.href='login.html'" data-translate="login">Login</button>
+                    <button class="register-btn" onclick="window.location.href='register.html'" data-translate="register">Register</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <main id="main-content">
+        <!-- Dashboard Page -->
+        <div class="page-content" id="dashboard-page">
+            <div class="dashboard-grid">
+                <!-- 用电概览卡片 -->
+                <div class="card energy-overview">
+                    <h2 data-translate="monthlyOverview">Monthly Overview</h2>
+                    <div class="energy-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">324</span>
+                            <span class="stat-label" data-translate="usage">kWh</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">RM 156</span>
+                            <span class="stat-label">Estimated Cost</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用电趋势表 -->
+                <div class="card energy-chart">
+                    <h2 data-translate="usageTrend">Usage Trend</h2>
+                    <canvas id="usageChart"></canvas>
+                </div>
+
+                <!-- AI 建议卡片 -->
+                <div class="card ai-recommendations">
+                    <h2 data-translate="aiRecommendations">AI Energy Saving Tips</h2>
+                    <div class="recommendations-list" id="aiRecommendations">
+                        <!-- 建议将通过 JS 动态添加 -->
+                    </div>
+                </div>
+
+                <!-- 实时用电监控 -->
+                <div class="card real-time-usage">
+                    <h2 data-translate="realTimeUsage">Real-time Usage</h2>
+                    <div class="usage-meter">
+                        <div class="meter-value">
+                            <span id="currentUsage">2.4</span>
+                            <span class="unit">kW</span>
+                        </div>
+                        <div class="meter-gauge" id="usageGauge"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Page -->
+        <div class="page-content" id="analysis-page" style="display: none;">
+            <div class="analysis-container">
+                <div class="card overview-card">
+                    <h2 data-translate="usageOverview">Usage Overview</h2>
+                    <div class="overview-stats">
+                        <div class="stat-item">
+                            <span class="stat-label" data-translate="avgDailyUsage">Average Daily Usage</span>
+                            <span class="stat-value" id="avgDailyUsage">12.5 kWh</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-translate="peakHourUsage">Peak Hour Usage</span>
+                            <span class="stat-value" id="peakHourUsage">2.8 kW</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-translate="monthlyTrend">Monthly Trend</span>
+                            <span class="stat-value trend-up" id="monthlyTrend">↑ 5.2%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 data-translate="energyUsageAnalysis">Energy Usage Analysis</h2>
+                    <div class="analysis-charts">
+                        <div class="chart-container">
+                            <h3 data-translate="dailyUsagePattern">Daily Usage Pattern</h3>
+                            <canvas id="dailyPatternChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3 data-translate="monthlyComparison">Monthly Comparison</h3>
+                            <canvas id="monthlyComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 data-translate="usageBreakdown">Usage Breakdown</h2>
+                    <div class="breakdown-chart">
+                        <canvas id="breakdownChart"></canvas>
+                    </div>
+                    <div class="breakdown-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #FF6384"></span>
+                            <span class="legend-label" data-translate="airConditioning">Air Conditioning</span>
+                        </div>
+                        <!-- Add more legend items -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Recommendations Page -->
+        <div class="page-content" id="recommendations-page" style="display: none;">
+            <div class="recommendations-container">
+                <div class="card">
+                    <h2 data-translate="personalizedEnergySavingTips">Personalized Energy Saving Tips</h2>
+                    <div class="tips-list" id="aiTipsList">
+                        <!-- AI tips will be dynamically added here -->
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 data-translate="potentialSavings">Potential Savings</h2>
+                    <div class="savings-summary">
+                        <div class="saving-item">
+                            <span class="saving-value">RM 45</span>
+                            <span class="saving-label" data-translate="monthlyPotentialSavings">Monthly Potential Savings</span>
+                        </div>
+                        <div class="saving-item">
+                            <span class="saving-value">15%</span>
+                            <span class="saving-label" data-translate="usageReductionTarget">Usage Reduction Target</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Leaderboard Page -->
+        <div class="page-content" id="leaderboard-page" style="display: none;">
+            <div class="leaderboard-container">
+                <div class="card">
+                    <h2 data-translate="communityChampions">Community Energy Saving Champions</h2>
+                    <div class="leaderboard-filters">
+                        <select id="area-filter" title="Select Area" aria-label="Filter by Area">
+                            <option value="all" data-translate="allAreas">All Areas</option>
+                            <option value="north" data-translate="northRegion">North Region</option>
+                            <option value="south" data-translate="southRegion">South Region</option>
+                            <option value="central" data-translate="centralRegion">Central Region</option>
+                        </select>
+                        <select id="time-filter" title="Select Time Period" aria-label="Filter by Time Period">
+                            <option value="month" data-translate="thisMonth">This Month</option>
+                            <option value="quarter" data-translate="thisQuarter">This Quarter</option>
+                            <option value="year" data-translate="thisYear">This Year</option>
+                        </select>
+                    </div>
+                    <div class="leaderboard-list" id="leaderboardList">
+                        <!-- Top 3 with special styling -->
+                        <div class="top-performers">
+                            <div class="top-performer second-place">
+                                <div class="rank">2</div>
+                                <div class="avatar">👨‍👧‍👦</div>
+                                <div class="name">Ahmad Family</div>
+                                <div class="savings">42 kWh saved</div>
+                                <div class="points">1150 pts</div>
+                            </div>
+                            <div class="top-performer first-place">
+                                <div class="rank">1</div>
+                                <div class="avatar">👨‍👩‍👦</div>
+                                <div class="name">Wong Family</div>
+                                <div class="savings">45 kWh saved</div>
+                                <div class="points">1200 pts</div>
+                            </div>
+                            <div class="top-performer third-place">
+                                <div class="rank">3</div>
+                                <div class="avatar">👨‍👩‍👧‍👦</div>
+                                <div class="name">Kumar Family</div>
+                                <div class="savings">38 kWh saved</div>
+                                <div class="points">1050 pts</div>
+                            </div>
+                        </div>
+                        <!-- Rest of the leaderboard -->
+                        <div class="leaderboard-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th data-translate="rank">Rank</th>
+                                        <th data-translate="family">Family</th>
+                                        <th data-translate="energySaved">Energy Saved</th>
+                                        <th data-translate="points">Points</th>
+                                        <th data-translate="rewards">Rewards</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboardBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Rewards Information -->
+                    <div class="rewards-info">
+                        <h3 data-translate="rewardsProgram">Rewards Program</h3>
+                        <div class="rewards-grid">
+                            <div class="reward-item">
+                                <div class="reward-icon">🏆</div>
+                                <div class="reward-title" data-translate="monthlyRebate">Monthly Rebate</div>
+                                <div class="reward-description" data-translate="rebateDescription">Top 10 families get 10% off their bill</div>
+                            </div>
+                            <div class="reward-item">
+                                <div class="reward-icon">🌟</div>
+                                <div class="reward-title" data-translate="greenPoints">Green Points</div>
+                                <div class="reward-description" data-translate="pointsDescription">Redeem points for eco-friendly products</div>
+                                <button class="redeem-btn" onclick="showRedeemModal()" data-translate="redeemNow">Redeem Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page-content" id="settings-page" style="display: none;">
+            <div class="settings-container">
+                <!-- Profile Settings -->
+                <div class="card settings-section">
+                    <h2 data-translate="profileSettings">Profile Settings</h2>
+                    <form id="settings-profile-form" class="settings-form">
+                        <div class="form-group">
+                            <label for="settings-fullname" data-translate="fullName">Full Name</label>
+                            <input type="text" id="settings-fullname" name="fullname" required 
+                                   autocomplete="name" aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-email" data-translate="email">Email</label>
+                            <input type="email" id="settings-email" name="email" required 
+                                   autocomplete="email" aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-phone" data-translate="phone">Phone Number</label>
+                            <input type="tel" id="settings-phone" name="phone" required 
+                                   autocomplete="tel" aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-address" data-translate="address">Home Address</label>
+                            <textarea id="settings-address" name="address" rows="3" required 
+                                      autocomplete="street-address" aria-required="true"></textarea>
+                        </div>
+                        <button type="submit" class="save-btn" data-translate="updateProfile">Update Profile</button>
+                    </form>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="card settings-section">
+                    <h2 data-translate="securitySettings">Security Settings</h2>
+                    <form id="security-form" class="settings-form">
+                        <div class="form-group">
+                            <label for="current-password" data-translate="currentPassword">Current Password</label>
+                            <input type="password" id="current-password" name="current-password" required 
+                                   autocomplete="current-password" aria-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password" data-translate="newPassword">New Password</label>
+                            <input type="password" id="new-password" name="new-password" required 
+                                   autocomplete="new-password" aria-required="true"
+                                   aria-describedby="password-requirements">
+                            <div id="password-requirements" class="password-requirements">
+                                Must contain at least one number, one uppercase and lowercase letter, 
+                                and at least 6 characters
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password" data-translate="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirm-password" name="confirm-password" required>
+                        </div>
+                        <button type="submit" class="save-btn" data-translate="changePassword">Change Password</button>
+                    </form>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="card settings-section">
+                    <h2 data-translate="notificationSettings">Notification Settings</h2>
+                    <form id="notification-form" class="settings-form">
+                        <div class="form-group">
+                            <label data-translate="notificationMethods">Notification Methods</label>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" name="notification_email" checked>
+                                    Email Notifications
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="notification_sms" checked>
+                                    SMS Notifications
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="notification_push">
+                                    Push Notifications
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="alertTypes">Alert Types</label>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" name="alert_usage" checked>
+                                    Usage Alerts
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="alert_tips" checked>
+                                    Energy Saving Tips
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="alert_bill" checked>
+                                    Bill Reminders
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="usage-threshold" data-translate="usageAlertThreshold">
+                                Usage Alert Threshold (kWh)
+                            </label>
+                            <input type="number" id="usage-threshold" name="usage_threshold" value="300"
+                                   min="0" max="1000" step="1" aria-label="Set usage alert threshold">
+                        </div>
+                        <button type="submit" class="save-btn" data-translate="saveNotificationSettings">Save Notification Settings</button>
+                    </form>
+                </div>
+
+                <!-- Two-Factor Authentication -->
+                <div class="card settings-section">
+                    <h2 data-translate="twoFactorAuthentication">Two-Factor Authentication</h2>
+                    <div class="two-factor-status">
+                        <div class="status-indicator">
+                            <span class="status-icon">🔒</span>
+                            <span class="status-text">Currently: <strong>Disabled</strong></span>
+                        </div>
+                        <button id="enable-2fa" class="action-btn">Enable 2FA</button>
+                    </div>
+                    <div class="setup-2fa" style="display: none;">
+                        <div class="qr-code">
+                            <!-- QR Code will be inserted here -->
+                        </div>
+                        <div class="verification-steps">
+                            <ol>
+                                <li>Scan the QR code with your authenticator app</li>
+                                <li>Enter the verification code below</li>
+                            </ol>
+                            <div class="form-group">
+                                <input type="text" id="verification-code" placeholder="Enter 6-digit code">
+                                <button class="verify-btn">Verify & Enable</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Verification -->
+                <div class="card settings-section">
+                    <h2 data-translate="accountVerification">Account Verification</h2>
+                    <div class="verification-status">
+                        <div class="status-item">
+                            <span class="status-icon">✉️</span>
+                            <span class="status-label">Email</span>
+                            <span class="status-value verified">Verified</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-icon">📱</span>
+                            <span class="status-label">Phone</span>
+                            <span class="status-value pending">Pending</span>
+                            <button class="verify-btn">Verify Now</button>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-icon">📄</span>
+                            <span class="status-label">ID Verification</span>
+                            <span class="status-value unverified">Unverified</span>
+                            <button class="verify-btn">Start Verification</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page-content" id="profile-page" style="display: none;">
+            <div class="settings-container">
+                <div class="card settings-section">
+                    <h2 data-translate="profileSettings">Profile Settings</h2>
+                    <form id="main-profile-form" class="settings-form">
+                        <div class="form-group">
+                            <label for="profile-fullname" data-translate="fullName">Full Name</label>
+                            <input type="text" id="profile-fullname" name="fullname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-email" data-translate="email">Email</label>
+                            <input type="email" id="profile-email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-phone" data-translate="phone">Phone Number</label>
+                            <input type="tel" id="profile-phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-address" data-translate="address">Home Address</label>
+                            <textarea id="profile-address" name="address" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="save-btn" data-translate="updateProfile">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/community-leaderboard.js"></script>
+    <script src="js/redeem.js"></script>
+    <script src="js/settings.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Page loaded, initializing...');
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                try {
+                    window.dashboard = new Dashboard();
+                    await dashboard.init();
+                    console.log('Dashboard initialization complete');
+                    
+                    // 如果当前是分析页面，确保图表显示
+                    const currentPage = window.location.hash.substring(1) || 'dashboard';
+                    if (currentPage === 'analysis') {
+                        dashboard.setupCharts();
+                    }
+                    
+                    document.getElementById('language').value = 'en';
+                    changeLanguage();
+                } catch (error) {
+                    console.error('Error during initialization:', error);
+                }
+            }
+        });
+    </script>
+
+    <!-- 添加兑换弹窗 -->
+    <div id="redeemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Redeem Green Points</h2>
+                <span class="close" onclick="closeRedeemModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="points-balance">
+                    <span>Your Points Balance:</span>
+                    <span class="points-value">1200</span>
+                </div>
+                <div class="redeem-items">
+                    <div class="redeem-item">
+                        <div class="item-image">LED Bulb</div>
+                        <div class="item-details">
+                            <h3>Energy-Saving LED Bulb</h3>
+                            <p>9W LED bulb, equivalent to 60W traditional bulb</p>
+                            <div class="points-cost">500 points</div>
+                        </div>
+                        <button class="redeem-item-btn" data-points="500">Redeem</button>
+                    </div>
+                    <div class="redeem-item">
+                        <div class="item-image">Smart Plug</div>
+                        <div class="item-details">
+                            <h3>Smart Power Plug</h3>
+                            <p>Monitor and control your appliances remotely</p>
+                            <div class="points-cost">800 points</div>
+                        </div>
+                        <button class="redeem-item-btn" data-points="800">Redeem</button>
+                    </div>
+                    <div class="redeem-item">
+                        <div class="item-image">Solar Charger</div>
+                        <div class="item-details">
+                            <h3>Solar Power Bank</h3>
+                            <p>10000mAh solar-powered charging bank</p>
+                            <div class="points-cost">1000 points</div>
+                        </div>
+                        <button class="redeem-item-btn" data-points="1000">Redeem</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
